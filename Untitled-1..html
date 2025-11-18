@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Persuratan Digital - DPU Bina Marga</title>
+    <!-- Memuat Tailwind CSS untuk styling modern dan responsif -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Konfigurasi Tailwind untuk Font Inter dan Variasi Warna Biru Khas DPU -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'dpu-navy': '#1D4ED8', // Biru Tua Utama (Dominan, Mewakili Kualitas/Kepercayaan)
+                        'dpu-light': '#60A5FA', // Biru Muda Aksen (Inovatif, Dinamis)
+                        'dpu-dark': '#1E3A8A', // Biru Sangat Tua (Profesional, Solid)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Gaya kustom untuk tampilan yang lebih menarik dan unik */
+        body {
+            background-color: #F8F9FA; /* Background sangat terang untuk kontras yang baik */
+            font-family: 'Inter', sans-serif;
+        }
+        .sidebar {
+            transition: width 0.3s ease;
+        }
+        .sidebar-item {
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            border-radius: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        .sidebar-item.active {
+            background-color: #3B82F6; /* Biru terang untuk status aktif navigasi */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5); /* Shadow untuk menonjolkan */
+        }
+        .sidebar-item:not(.active):hover {
+            background-color: #374151; /* Hover gelap untuk kesan premium */
+        }
+        .card {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Shadow lembut */
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: translateY(-2px); /* Efek sedikit terangkat saat di-hover */
+        }
+        .progress-bar-container {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #E5E7EB;
+        }
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease-in-out;
+        }
+    </style>
+</head>
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar (Navigasi Kiri) - Biru Tua Profesional -->
+    <div id="sidebar" class="sidebar w-64 bg-dpu-dark text-white p-4 flex flex-col shrink-0">
+        <div class="mb-8 p-2 text-2xl font-extrabold text-dpu-light">
+            E-SURAT DPU
+        </div>
+
+        <!-- Menu Navigasi -->
+        <nav class="space-y-2">
+            <div id="nav-dashboard" class="sidebar-item active" onclick="showPage('dashboard')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l-7-7m7 7v10a1 1 0 01-1 1h-3m-6 0a1 1 0 00-1-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                Dashboard Utama
+            </div>
+            <div id="nav-incoming" class="sidebar-item" onclick="showPage('incoming')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4-1v8m0 0l-3-3m3 3l3-3M8 9h8" />
+                </svg>
+                Surat Masuk
+            </div>
+            <div id="nav-outgoing" class="sidebar-item" onclick="showPage('outgoing')">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 4H6a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-2m-4 1v8m0 0l-3-3m3 3l3-3M8 9h8" />
+                </svg>
+                Surat Keluar
+            </div>
+        </nav>
+
+        <div class="mt-auto pt-4 text-xs text-gray-400 border-t border-gray-700">
+            Simulasi Administrasi Perkantoran Digital.
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col overflow-hidden">
+
+        <!-- Header - Biru Muda Aksen -->
+        <header class="bg-white shadow-md p-4 flex justify-between items-center sticky top-0 z-10 border-b-4 border-dpu-navy">
+            <h1 id="page-title" class="text-2xl font-semibold text-dpu-dark">Dashboard Utama</h1>
+            <div class="flex items-center space-x-4">
+                <span class="text-gray-600">Admin Pendidikan</span>
+                <div class="h-10 w-10 bg-dpu-light rounded-full flex items-center justify-center text-white font-bold">AP</div>
+            </div>
+        </header>
+
+        <!-- Content Area with Scrolling -->
+        <main class="flex-1 overflow-y-auto p-6 md:p-10">
+
+            <!-- PAGE 1: Dashboard Utama -->
+            <div id="page-dashboard" class="page-content space-y-8">
+                
+                <!-- Welcome Card (Kartu Selamat Datang Unik) -->
+                <div class="bg-gradient-to-r from-dpu-navy to-dpu-light p-6 rounded-xl text-white shadow-2xl">
+                    <h2 class="text-4xl font-extrabold mb-1">Selamat Datang, Admin Pendidikan!</h2>
+                    <p class="text-lg font-light opacity-90">Sistem Persuratan Digital DPU Bina Marga.</p>
+                    <div class="mt-4 pt-3 border-t border-blue-400 flex justify-between items-center">
+                        <p id="current-datetime" class="text-sm font-medium opacity-80"></p>
+                        <span class="text-xs font-semibold px-3 py-1 bg-white bg-opacity-20 rounded-full">Sistem Aktif</span>
+                    </div>
+                </div>
+
+                <h2 class="text-3xl font-bold text-dpu-dark mb-6">Ringkasan Persuratan Bulan Ini</h2>
+
+                <!-- Kartu Statistik Utama -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Total Surat -->
+                    <div class="card bg-dpu-navy text-white p-6 rounded-xl">
+                        <p class="text-sm opacity-80">Total Surat Diproses</p>
+                        <p class="text-4xl font-extrabold mt-1">452</p>
+                        <p class="text-xs opacity-70 mt-2">Peningkatan 12% dari bulan lalu</p>
+                    </div>
+
+                    <!-- Surat Masuk Baru -->
+                    <div class="card bg-white p-6 rounded-xl border-t-4 border-dpu-light">
+                        <p class="text-sm text-gray-500">Surat Masuk Baru (Menunggu)</p>
+                        <p class="text-4xl font-extrabold mt-1 text-dpu-dark">45</p>
+                        <p class="text-xs text-gray-400 mt-2">Perlu tindak lanjut segera</p>
+                    </div>
+
+                    <!-- Surat Keluar Selesai -->
+                    <div class="card bg-white p-6 rounded-xl border-t-4 border-green-500">
+                        <p class="text-sm text-gray-500">Surat Keluar Terkirim</p>
+                        <p class="text-4xl font-extrabold mt-1 text-dpu-dark">210</p>
+                        <p class="text-xs text-gray-400 mt-2">Telah disetujui dan dikirim</p>
+                    </div>
+
+                    <!-- Kepatuhan Disposisi -->
+                    <div class="card bg-white p-6 rounded-xl border-t-4 border-yellow-500">
+                        <p class="text-sm text-gray-500">Rata-rata Waktu Proses</p>
+                        <p class="text-4xl font-extrabold mt-1 text-dpu-dark">2.4 Hari</p>
+                        <p class="text-xs text-gray-400 mt-2">Target: &lt; 3 Hari</p>
+                    </div>
+                </div>
+
+                <!-- Bagian Detail dan Visual -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Grafik Visual Sederhana: Tren Jenis Surat -->
+                    <div class="card bg-white p-6 rounded-xl lg:col-span-2">
+                        <h3 class="text-xl font-semibold text-dpu-dark mb-4">Tren Persuratan Digital (Q3 2025)</h3>
+                        <!-- Representasi Visual Sederhana (Progress Bar) -->
+                        <div class="space-y-4">
+                            <div>
+                                <div class="flex justify-between text-sm text-gray-600">
+                                    <span>Surat Tugas/Perjalanan Dinas</span>
+                                    <span>85%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar bg-blue-500" style="width: 85%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm text-gray-600">
+                                    <span>Memo Internal/Nota Dinas</span>
+                                    <span>60%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar bg-indigo-500" style="width: 60%;"></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="flex justify-between text-sm text-gray-600">
+                                    <span>Surat Keputusan (SK)</span>
+                                    <span>40%</span>
+                                </div>
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar bg-teal-500" style="width: 40%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-xs text-gray-500">Visualisasi ini menunjukkan adopsi tertinggi pada jenis Surat Tugas.</p>
+                        
+                    </div>
+
+                    <!-- Aktivitas Terbaru (Log Persuratan) -->
+                    <div class="card bg-white p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-dpu-dark mb-4">Aktivitas Terbaru</h3>
+                        <ul class="space-y-3 text-sm">
+                            <li class="p-3 bg-blue-50 rounded-lg border-l-4 border-dpu-light">
+                                <p class="font-medium text-dpu-dark">Disposisi Surat Masuk: Undangan Rapat Koordinasi</p>
+                                <p class="text-xs text-gray-500">2 menit lalu | Oleh: Kabid Jalan</p>
+                            </li>
+                            <li class="p-3 bg-blue-50 rounded-lg border-l-4 border-dpu-light">
+                                <p class="font-medium text-dpu-dark">Surat Keluar Baru: Surat Tugas Survei Jembatan</p>
+                                <p class="text-xs text-gray-500">1 jam lalu | Oleh: Staf Administrasi</p>
+                            </li>
+                            <li class="p-3 bg-blue-50 rounded-lg border-l-4 border-dpu-light">
+                                <p class="font-medium text-dpu-dark">Arsip Surat Keputusan No. 123/SK/2025</p>
+                                <p class="text-xs text-gray-500">4 jam lalu | Status: Selesai</p>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: Data Surat Masuk -->
+            <div id="page-incoming" class="page-content hidden space-y-8">
+                <h2 class="text-3xl font-bold text-dpu-dark mb-6">Data Surat Masuk (Inbox Digital)</h2>
+                
+                <!-- Filter dan Aksi -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 bg-blue-50 p-4 rounded-xl border border-dpu-light">
+                    <div class="flex space-x-3">
+                        <select class="p-2 border border-gray-300 rounded-lg text-sm text-dpu-dark focus:ring-dpu-light focus:border-dpu-light">
+                            <option>Semua Status</option>
+                            <option>Menunggu Disposisi</option>
+                            <option>Sudah Didisposisi</option>
+                            <option>Diarsipkan</option>
+                        </select>
+                        <input type="date" class="p-2 border border-gray-300 rounded-lg text-sm text-dpu-dark focus:ring-dpu-light focus:border-dpu-light">
+                    </div>
+                    <button class="bg-dpu-navy hover:bg-dpu-dark text-white font-medium py-2 px-4 rounded-lg flex items-center shadow-lg transition duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M10 2a8 8 0 100 16 8 8 0 000-16zm1 11a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 00-2 0v4a1 1 0 102 0V6z" />
+                        </svg>
+                        Buat Laporan Masuk
+                    </button>
+                </div>
+
+                <!-- Tabel Data Surat Masuk (menggunakan Card untuk responsivitas) -->
+                <div id="incoming-list" class="space-y-4">
+                    <!-- Item Surat Masuk 1: Menunggu Disposisi (Kuning) -->
+                    <div class="card bg-white p-5 rounded-xl border-l-8 border-yellow-500 flex justify-between items-center transition duration-300">
+                        <div>
+                            <p class="text-lg font-bold text-dpu-dark">001/UND/RAKOR/IX/2025</p>
+                            <p class="text-sm text-gray-600">Perihal: Undangan Rapat Koordinasi Anggaran Proyek</p>
+                            <p class="text-xs text-gray-400 mt-1">Pengirim: Sekretariat Jenderal Kementerian PUPR | Diterima: 20/09/2025</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-1">
+                            <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Menunggu Disposisi</span>
+                            <button class="text-dpu-navy hover:text-dpu-light text-sm font-medium">Lihat Detail</button>
+                        </div>
+                    </div>
+
+                    <!-- Item Surat Masuk 2: Sudah Didisposisi (Hijau) -->
+                    <div class="card bg-white p-5 rounded-xl border-l-8 border-green-500 flex justify-between items-center transition duration-300">
+                        <div>
+                            <p class="text-lg font-bold text-dpu-dark">005/SPT/2025/BALAI</p>
+                            <p class="text-sm text-gray-600">Perihal: Laporan Progres Proyek Pembangunan Jembatan</p>
+                            <p class="text-xs text-gray-400 mt-1">Pengirim: Balai Besar Wilayah 1 | Diterima: 18/09/2025</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-1">
+                            <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Sudah Didisposisi</span>
+                            <button class="text-dpu-navy hover:text-dpu-light text-sm font-medium">Lihat Detail</button>
+                        </div>
+                    </div>
+
+                    <!-- Item Surat Masuk 3: Tindak Lanjut Mendesak (Merah) -->
+                    <div class="card bg-white p-5 rounded-xl border-l-8 border-red-500 flex justify-between items-center transition duration-300">
+                        <div>
+                            <p class="text-lg font-bold text-dpu-dark">002/PENG/BPN/2025</p>
+                            <p class="text-sm text-gray-600">Perihal: Pemberitahuan Peninjauan Lahan Tol Baru</p>
+                            <p class="text-xs text-gray-400 mt-1">Pengirim: Badan Pertanahan Nasional | Diterima: 15/09/2025</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-1">
+                            <span class="px-3 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Tindak Lanjut MendesaK</span>
+                            <button class="text-dpu-navy hover:text-dpu-light text-sm font-medium">Lihat Detail</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 3: Data Surat Keluar -->
+            <div id="page-outgoing" class="page-content hidden space-y-8">
+                <h2 class="text-3xl font-bold text-dpu-dark mb-6">Data Surat Keluar (Arsip Kirim)</h2>
+
+                <!-- Filter dan Aksi -->
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center space-y-4 md:space-y-0 bg-blue-50 p-4 rounded-xl border border-dpu-light">
+                    <div class="flex space-x-3">
+                        <select class="p-2 border border-gray-300 rounded-lg text-sm text-dpu-dark focus:ring-dpu-light focus:border-dpu-light">
+                            <option>Semua Jenis</option>
+                            <option>Surat Tugas</option>
+                            <option>Surat Edaran</option>
+                            <option>Nota Dinas</option>
+                        </select>
+                        <select class="p-2 border border-gray-300 rounded-lg text-sm text-dpu-dark focus:ring-dpu-light focus:border-dpu-light">
+                            <option>Semua Status</option>
+                            <option>Draft</option>
+                            <option>Menunggu Persetujuan</option>
+                            <option>Terkirim</option>
+                        </select>
+                    </div>
+                    <button class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg flex items-center shadow-lg transition duration-300">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zm-7.586 7.586a1 1 0 00-1 1v2a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 00-1-1h-2z" />
+                        </svg>
+                        Buat Surat Baru
+                    </button>
+                </div>
+
+                <!-- Tabel Data Surat Keluar (menggunakan Card untuk responsivitas) -->
+                <div id="outgoing-list" class="space-y-4">
+                    <!-- Item Surat Keluar 1: Terkirim (Hijau) -->
+                    <div class="card bg-white p-5 rounded-xl border-r-8 border-green-500 flex justify-between items-center transition duration-300">
+                        <div>
+                            <p class="text-lg font-bold text-dpu-dark">012/ST/SUBBAG/X/2025</p>
+                            <p class="text-sm text-gray-600">Jenis: Surat Tugas | Tujuan: Divisi Pengadaan Aset</p>
+                            <p class="text-xs text-gray-400 mt-1">Tanggal Kirim: 25/09/2025 | Dibuat: Staf Admin</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-1">
+                            <span class="px-3 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Terkirim</span>
+                            <button class="text-dpu-navy hover:text-dpu-light text-sm font-medium">Riwayat Persetujuan</button>
+                        </div>
+                    </div>
+
+                    <!-- Item Surat Keluar 2: Menunggu Persetujuan (Kuning) -->
+                    <div class="card bg-white p-5 rounded-xl border-r-8 border-yellow-500 flex justify-between items-center transition duration-300">
+                        <div>
+                            <p class="text-lg font-bold text-dpu-dark">015/ND/KABID/X/2025</p>
+                            <p class="text-sm text-gray-600">Jenis: Nota Dinas | Tujuan: Kepala Dinas DPU BM</p>
+                            <p class="text-xs text-gray-400 mt-1">Tanggal Dibuat: 26/09/2025 | Dibuat: Kabid Jalan</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-1">
+                            <span class="px-3 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Menunggu Persetujuan</span>
+                            <button class="text-dpu-navy hover:text-dpu-light text-sm font-medium">Edit Draft</button>
+                        </div>
+                    </div>
+
+                    <!-- Item Surat Keluar 3: Diarsipkan (Abu-abu) -->
+                    <div class="card bg-white p-5 rounded-xl border-r-8 border-gray-400 flex justify-between items-center transition duration-300">
+                        <div>
+                            <p class="text-lg font-bold text-dpu-dark">010/SE/DIREKT/IX/2025</p>
+                            <p class="text-sm text-gray-600">Jenis: Surat Edaran | Tujuan: Seluruh Staf Teknis</p>
+                            <p class="text-xs text-gray-400 mt-1">Tanggal Kirim: 19/09/2025 | Dibuat: Sekretaris</p>
+                        </div>
+                        <div class="flex flex-col items-end space-y-1">
+                            <span class="px-3 py-1 text-xs font-semibold text-gray-800 bg-gray-200 rounded-full">Diarsipkan</span>
+                            <button class="text-dpu-navy hover:text-dpu-light text-sm font-medium">Lihat Dokumen</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <script>
+        // Fungsi untuk menampilkan tanggal dan waktu saat ini (untuk kartu selamat datang)
+        function updateDateTime() {
+            const dtElement = document.getElementById('current-datetime');
+            if (dtElement) {
+                const now = new Date();
+                // Opsi format tanggal dan waktu dalam bahasa Indonesia
+                const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                dtElement.textContent = now.toLocaleDateString('id-ID', options);
+            }
+        }
+
+        // Fungsi untuk mengelola perpindahan halaman (View Switching)
+        function showPage(pageId) {
+            // 1. Sembunyikan semua konten halaman
+            const contents = document.querySelectorAll('.page-content');
+            contents.forEach(content => {
+                content.classList.add('hidden');
+            });
+
+            // 2. Tampilkan halaman yang diminta
+            const targetPage = document.getElementById('page-' + pageId);
+            const pageTitle = document.getElementById('page-title');
+            const navItems = document.querySelectorAll('.sidebar-item');
+
+            if (targetPage) {
+                targetPage.classList.remove('hidden');
+
+                // 3. Update judul header dan status navigasi
+                let title = '';
+                switch(pageId) {
+                    case 'dashboard':
+                        title = 'Dashboard Utama';
+                        break;
+                    case 'incoming':
+                        title = 'Data Surat Masuk';
+                        break;
+                    case 'outgoing':
+                        title = 'Data Surat Keluar';
+                        break;
+                    default:
+                        title = 'Dashboard Persuratan';
+                }
+                pageTitle.textContent = title;
+
+                // Hapus kelas 'active' dari semua item navigasi
+                navItems.forEach(item => item.classList.remove('active'));
+
+                // Tambahkan kelas 'active' ke item navigasi yang sesuai
+                // Menggunakan ID yang disesuaikan: 'nav-incoming' dan 'nav-outgoing'
+                const activeNav = document.getElementById('nav-' + pageId);
+                if (activeNav) {
+                    activeNav.classList.add('active');
+                }
+            } else {
+                console.error('Halaman dengan ID ' + pageId + ' tidak ditemukan.');
+            }
+        }
+
+        // Tampilkan dashboard saat aplikasi dimuat dan mulai update waktu
+        document.addEventListener('DOMContentLoaded', () => {
+            updateDateTime();
+            setInterval(updateDateTime, 1000); // Update setiap detik
+            showPage('dashboard');
+        });
+
+    </script>
+</body>
+</html>
